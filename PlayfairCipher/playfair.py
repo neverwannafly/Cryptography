@@ -66,7 +66,7 @@ class PlayfairCipher:
         return self.keymap[x][index]
 
     def _get_top(self, x, y):
-        index = x-1 if x-1>=0 else 0
+        index = x-1 if x-1>=0 else 4
         return self.keymap[index][y]
         
     def _is_same_row(self, l1, l2, do_decrypt=False):
@@ -209,7 +209,7 @@ class PlayfairCipher:
         return decrypted_message
 
 a = PlayfairCipher("ANOTHER")
-a.set_message("eno")
+a.set_message("we live in a world full of beauty")
 b = a.encrypt()
 a.set_encrypted_message(b)
 c = a.decrypt()
