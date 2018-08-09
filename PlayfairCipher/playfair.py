@@ -13,7 +13,6 @@ class PlayfairCipher:
         self.keymap = self._generate_keymap()
         self.message = None
         self.encrypted_message = None
-        print(self.keymap)
 
     def set_message(self, message):
         self._check_message_validity(message)
@@ -176,7 +175,6 @@ class PlayfairCipher:
         encrypted_message = ""
 
         plain_text = self._process_plain_text(self.message)
-        print(plain_text)
 
         for text in plain_text:
             same_row_try = self._is_same_row(text[:1].upper(), text[1:].upper())
