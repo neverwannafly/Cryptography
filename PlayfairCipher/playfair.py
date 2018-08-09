@@ -10,6 +10,7 @@ class PlayfairCipher:
     def __init__(self, key):
         self._check_key_validity(key)
         self.key = self._attenuate_key(key)
+        self.keymap = self._generate_keymap()
         self.message = None
 
     def set_message(self, message):
@@ -24,13 +25,73 @@ class PlayfairCipher:
         if not message.islower():
             raise InvalidMessageFormat("Message must be in lowercase english letters!")
 
-    def _generate_key(self):
-        initial_key = list(self.key)
+    def _generate_key(self, key):
+        initial_key = list(key)
         letters = "".join(string.ascii_lowercase.split('j'))
         for letter in letters:
-            if letter not in self.key.lower():
+            if letter not in key.lower():
                 initial_key.append(letter)
         return initial_key
+
+    def _generate_keymap(self):
+        key = self._generate_key(self.key)
+        keymap = []
+        for i in range(0,5):
+            submap = []
+            for j in range(0,5):
+                submap.append(key[(i*5)+j])
+            keymap.append(submap)
+        return keymap
+
+    def _get_right(self, x, y):
+        index = y+1 if y+1<5 else 0
+        return self.keymap[x][index]
+
+    def _get_below(self, x, y):
+        index = x+1 if x+1<5 else 0
+        return self.keymap[index][y]
+
+    def _get_left(self, x, y):
+        index = y-1 if y-1>=0 else 4
+        return self.keymap[x][index]
+
+    def _get_top(self, x, y):
+        index = x-1 if x-1>=0 else 0
+        return self.keymap[index][y]
+        
+    def _is_same_row(self, l1, l2):
+        search_l1 = self._search_letter(l1)
+        search_l2 = self._search_letter(l2)
+        if search_l1[0]==search_l2[0]:
+            return (True, "{0}{1}".format(
+                self._get_right(search_l1[0], search_l1[1]), 
+                self._get_right(search_l2[0], search_l2[1])
+            ))
+        return (False, None)
+
+    def _is_same_column(self, l1, l2):
+        search_l1 = self._search_letter(l1)
+        search_l2 = self._search_letter(l2)
+        if search_l1[1]==search_l2[1]:
+            return (True, "{0}{1}".format(
+                self._get_bottom(search_l1[0], search_l1[1]), 
+                self._get_bottom(search_l2[0], search_l2[1])
+            ))
+        return (False, None)
+
+    def _matrix_match(self, l1, l2):
+        search_l1 = self._search_letter(l1)
+        search_l2 = self._search_letter(l2)
+        return "{0}{1}".format(
+            self.keymap[search_l1[0]][search_l2[1]],
+            self.keymap[search_l2[0]][search_l1[1]]
+        )
+
+    def _search_letter(self, letter):
+        for i in range(0,5):
+            for j in range(0,5):
+                if self.keymap[i][j] == letter:
+                    return (i, j)
 
     def _insert_token_char(self, message, position, repeated_character):
         delimetter = 'z' if repeated_character=='x' else 'x'
@@ -83,7 +144,27 @@ class PlayfairCipher:
         return plain_text
 
     def encrypt(self):
-        return self._process_plain_text(self.message)
+        if self.message is None:
+            raise NoMessageAttached("Please attach a message by calling the set_message method!")
+
+        encrypted_message = ""
+
+        plain_text = self._process_plain_text(self.message)
+
+        for text in plain_text:
+            print(text)
+            print(text[:1], text[1:])
+            same_row_try = self._is_same_row(text[:1], text[1:])
+            same_column_try = self._is_same_column(text[:1], text[1:])
+            if same_row_try[0]:
+                encrypted_message += same_row_try[1]
+            elif same_column_try[0]:
+                encrypted_message += same_column_try[1]
+            else:
+                encrypted_message += self._matrix_match(text[:1], text[1:])
+            
+        return encrypted_message
+
 
     def decrypt(self):
         pass
@@ -91,5 +172,3 @@ class PlayfairCipher:
 a = PlayfairCipher("ANOTHER")
 a.set_message("my name is shubham anand!!! xxx heeej")
 b = a.encrypt()
-print(a._generate_key())
-print(b)
