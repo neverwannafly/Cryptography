@@ -27,9 +27,9 @@ class PlayfairCipher:
 
     def _generate_key(self, key):
         initial_key = list(key)
-        letters = "".join(string.ascii_lowercase.split('j'))
+        letters = "".join(string.ascii_uppercase.split('J'))
         for letter in letters:
-            if letter not in key.lower():
+            if letter not in key:
                 initial_key.append(letter)
         return initial_key
 
@@ -74,8 +74,8 @@ class PlayfairCipher:
         search_l2 = self._search_letter(l2)
         if search_l1[1]==search_l2[1]:
             return (True, "{0}{1}".format(
-                self._get_bottom(search_l1[0], search_l1[1]), 
-                self._get_bottom(search_l2[0], search_l2[1])
+                self._get_below(search_l1[0], search_l1[1]), 
+                self._get_below(search_l2[0], search_l2[1])
             ))
         return (False, None)
 
@@ -152,17 +152,15 @@ class PlayfairCipher:
         plain_text = self._process_plain_text(self.message)
 
         for text in plain_text:
-            print(text)
-            print(text[:1], text[1:])
-            same_row_try = self._is_same_row(text[:1], text[1:])
-            same_column_try = self._is_same_column(text[:1], text[1:])
+            same_row_try = self._is_same_row(text[:1].upper(), text[1:].upper())
+            same_column_try = self._is_same_column(text[:1].upper(), text[1:].upper())
             if same_row_try[0]:
                 encrypted_message += same_row_try[1]
             elif same_column_try[0]:
                 encrypted_message += same_column_try[1]
             else:
-                encrypted_message += self._matrix_match(text[:1], text[1:])
-            
+                encrypted_message += self._matrix_match(text[:1].upper(), text[1:].upper())
+        
         return encrypted_message
 
 
@@ -170,5 +168,6 @@ class PlayfairCipher:
         pass
 
 a = PlayfairCipher("ANOTHER")
-a.set_message("my name is shubham anand!!! xxx heeej")
+a.set_message("we live in a world full of beauty")
 b = a.encrypt()
+print(b)
