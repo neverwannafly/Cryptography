@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
 import random
 import string
 
-from exceptions import InvalidKeyFormat, InvalidMessageFormat, InvalidEncryptedMessage, NoMessageAttached
+from .exceptions import InvalidKeyFormat, InvalidMessageFormat, InvalidEncryptedMessage, NoMessageAttached
 
 class PlayfairCipher:
     
@@ -205,11 +203,3 @@ class PlayfairCipher:
             else:
                 decrypted_message += self._matrix_match(text[:1], text[1:], do_decrypt=True).lower()
         return decrypted_message
-
-a = PlayfairCipher("ANOTHER")
-a.set_message("we live in a world full of beauty")
-b = a.encrypt()
-a.set_encrypted_message(b)
-c = a.decrypt()
-print(b)
-print(c)
