@@ -3,3 +3,6 @@ class InvalidKeyFormat(Exception):
 
 class InvalidMessageFormat(Exception):
     pass
+
+class NoMessageAttached(Exception):
+    pass
